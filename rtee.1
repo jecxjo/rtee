@@ -1,0 +1,64 @@
+.TH man 1 "17 June 2015" "0.1" "rtee man page"
+.SH NAME
+.PP
+rtee \- read from standard input and write to standard output and a
+rotating file
+.SH SYNOPSIS
+.PP
+rtee [OPTION]...
+FILE
+.SH DESCRIPTION
+.PP
+\-a Append to the given FILE.
+.PP
+\-b num Maximum number of bytes per file (default 1M)
+.PP
+\-f num Maximum number of previous files before rotating (default 4)
+.PP
+\-h Display help.
+.PP
+The FILE name is appended with the count starting at FILE.0.
+When the maximum number of files is reached, the oldest one is deleted
+and the file number continues to increment.
+.SH EXAMPLES
+.PP
+To create 5 backup files with a size of 10 MB or less (10,000 bytes) of
+the listing of files found in your OS.
+.PP
+find / | rtee \-b 10000 \-f 5 listing.txt
+.PP
+This will output files named \f[I]listing.txt.N\f[] with 6 files, the
+highest number being the latest.
+.SH AUTHOR
+.PP
+Written by Jeff Parent.
+.SH REPORTING BUGS
+.PP
+Report bugs to <bugs@commentedcode.org>
+.SH COPYRIGHT
+.PP
+Copyright (c) 2015, Jeff Parent All rights reserved.
+.PP
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met: * Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+* Redistributions in binary form must reproduce the above copyright
+notice, this list of conditions and the following disclaimer in the
+documentation and/or other materials provided with the distribution.
+* Neither the name of the nor the names of its contributors may be used
+to endorse or promote products derived from this software without
+specific prior written permission.
+.PP
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
+IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+PARTICULAR PURPOSE ARE DISCLAIMED.
+IN NO EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE FOR ANY DIRECT,
+INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.

@@ -40,6 +40,7 @@ void print_help_and_die (void)
                         "    -a        append to the given FILE\n"
                         "    -b num    max number of bytes per file (default 1M)\n"
                         "    -f num    max number of previous files before roll over (default 4)\n"
+                        "    -h        display help\n"
                         "\n"
                         "The FILE name is appended with the count starting at FILE.0 and incrementing.\n"
                         "\n");
@@ -109,10 +110,10 @@ int main (int argc, char *argv[])
   unsigned int byte_count = 0;
   unsigned int file_count = 0;
   unsigned int del_count = 0;
-  int fd, ch, exitval, n, rval, wval;
+  int fd, ch, exitval, n, read_length, write_length;
   char append = 0;
   char *end;
-  char *wrt_pt;
+  char *write_pt;
   char *buf;
   size_t read_buffer_size = BSIZE;
 
@@ -155,21 +156,21 @@ int main (int argc, char *argv[])
   if ((buf = (char *)malloc((size_t)read_buffer_size))  == NULL)
     print_error_and_die("Unable to malloc");
 
-  while ((rval = read(STDIN_FILENO, buf, read_buffer_size)) > 0)
+  while ((read_length = read(STDIN_FILENO, buf, read_buffer_size)) > 0)
   {
     // Write to stdout
-    n = rval;
-    wrt_pt = buf;
+    n = read_length;
+    write_pt = buf;
     do
     {
-      if ((wval = write(STDOUT_FILENO, wrt_pt, n)) == -1)
+      if ((write_length = write(STDOUT_FILENO, write_pt, n)) == -1)
         print_error_and_die("write error: stdout");
 
-      wrt_pt += wval;
-    } while (n -= wval);
+      write_pt += write_length;
+    } while (n -= write_length);
 
     // check if new file is needed
-    if (byte_count + rval > max_bytes)
+    if (byte_count + read_length > max_bytes)
     {
       file_count += 1;
       close(fd);
@@ -185,17 +186,17 @@ int main (int argc, char *argv[])
     }
 
     // Write to file
-    n = rval;
-    wrt_pt = buf;
+    n = read_length;
+    write_pt = buf;
     do
     {
-      if ((wval = write(fd, wrt_pt, n)) == -1)
+      if ((write_length = write(fd, write_pt, n)) == -1)
         print_error_and_die("write error: file");
 
-      wrt_pt += wval;
-    } while (n -= wval);
+      write_pt += write_length;
+    } while (n -= write_length);
 
-    byte_count += rval;
+    byte_count += read_length;
   }
 
   close(fd);
