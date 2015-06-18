@@ -15,7 +15,7 @@ MANDIR = $(PREFIX)/share/man
 
 all: $(TARGET)
 
-$(TARGET): $(OBJS) $(MANSGZ)
+$(TARGET): $(OBJS)
 	$(CC) -o $@ $<
 
 %.o: %.c
@@ -27,7 +27,7 @@ $(TARGET): $(OBJS) $(MANSGZ)
 clean:
 	rm -f $(TARGET) $(OBJS) $(MANSGZ)
 
-install: $(TARGET) 
+install: $(TARGET) $(MANSGZ)
 	install -m 755 -d $(DESTDIR)$(BINDIR)
 	install -m 755 -t $(DESTDIR)$(BINDIR) $(TARGET)
 	install -m 755 -d $(DESTDIR)$(MANDIR)/man1

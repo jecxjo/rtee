@@ -21,6 +21,8 @@
 #include <errno.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 #define BSIZE (8 * 1024)
 
@@ -40,6 +42,7 @@ void print_help_and_die (void)
                         "    -a        append to the given FILE\n"
                         "    -b num    max number of bytes per file (default 1M)\n"
                         "    -f num    max number of previous files before roll over (default 4)\n"
+                        "    -B num    buffer size of read/write operation (default 8192)\n"
                         "    -h        display help\n"
                         "\n"
                         "The FILE name is appended with the count starting at FILE.0 and incrementing.\n"
@@ -86,7 +89,7 @@ void del_file (char *name, unsigned long count)
 
   if (child == 0)
   {
-    // Child deletes file as it may take a while
+    /* Child deletes file as it may take a while */
     if ((newName = malloc((size_t)(strlen(name) + 11))) == NULL)
       print_error_and_die("Unable to malloc");
 
@@ -110,14 +113,19 @@ int main (int argc, char *argv[])
   unsigned int byte_count = 0;
   unsigned int file_count = 0;
   unsigned int del_count = 0;
-  int fd, ch, exitval, n, read_length, write_length;
+  int i, fd, ch, exitval, n, read_length, write_length;
   char append = 0;
   char *end;
   char *write_pt;
   char *buf;
   size_t read_buffer_size = BSIZE;
 
-  while ((ch = getopt(argc, argv, "hab:f:")) != -1)
+  int files_count = 0;
+  char **files_name;
+  int *files_fd;
+
+  /* Arguments */
+  while ((ch = getopt(argc, argv, "hab:f:B:")) != -1)
     switch ((char)ch)
     {
       case 'h':
@@ -140,25 +148,47 @@ int main (int argc, char *argv[])
           print_usage_and_die();
         break;
 
+      case 'B':
+        read_buffer_size = (size_t)strtoul(optarg, &end, 10);
+        if (errno != 0)
+          print_usage_and_die();
+        break;
+
       default:
         print_usage_and_die();
         break;
     }
 
+  /* No files supplied for output */
   if (optind >= argc)
     print_usage_and_die();
 
-  fd = open_file(argv[optind], file_count, append);
+  /* Number of [FILE]... arguments */
+  files_count = argc - optind;
+  if ((files_name = malloc((size_t)(files_count * sizeof(char*)))) == NULL)
+      print_error_and_die("Unable to malloc");
 
-  if (max_bytes < BSIZE)
+  if ((files_fd = malloc((size_t)(files_count * sizeof(int)))) == NULL)
+      print_error_and_die("Unable to malloc");
+
+  /* Open all [FILE]... */
+  for (i = 0; i < files_count; i++)
+  {
+    files_name[i] = argv[optind + i];
+    files_fd[i] = open_file(files_name[i], file_count, append);
+  }
+
+  /* If max bytes per file is less the the read buffer shrink buffer */
+  if (max_bytes < read_buffer_size)
     read_buffer_size = (size_t)max_bytes;
 
   if ((buf = (char *)malloc((size_t)read_buffer_size))  == NULL)
     print_error_and_die("Unable to malloc");
 
+  /* read from STDIN until EOF */
   while ((read_length = read(STDIN_FILENO, buf, read_buffer_size)) > 0)
   {
-    // Write to stdout
+    /* Write to stdout */
     n = read_length;
     write_pt = buf;
     do
@@ -169,37 +199,52 @@ int main (int argc, char *argv[])
       write_pt += write_length;
     } while (n -= write_length);
 
-    // check if new file is needed
+    /* check if new file is needed */
     if (byte_count + read_length > max_bytes)
     {
       file_count += 1;
-      close(fd);
-      fd = open_file(argv[optind], file_count, append);
+
+      for (i = 0; i < files_count; i++)
+      {
+        close(files_fd[i]);
+        files_fd[i] = open_file(files_name[i], file_count, append);
+      }
       byte_count = 0;
 
-      // Check if file needs to be deleted
+      /* Check if file needs to be deleted */
       if (file_count > max_files)
       {
-        del_file(argv[optind], del_count);
+        for (i = 0; i < files_count; i++)
+          del_file(files_name[i], del_count);
+
         del_count += 1;
       }
     }
 
-    // Write to file
-    n = read_length;
-    write_pt = buf;
-    do
+    /* Write to files */
+    for (i = 0; i < files_count; i++)
     {
-      if ((write_length = write(fd, write_pt, n)) == -1)
-        print_error_and_die("write error: file");
+      n = read_length;
+      write_pt = buf;
+      do
+      {
+        if ((write_length = write(files_fd[i], write_pt, n)) == -1)
+          print_error_and_die("write error: file");
 
-      write_pt += write_length;
-    } while (n -= write_length);
+        write_pt += write_length;
+      } while (n -= write_length);
+    }
 
     byte_count += read_length;
   }
 
-  close(fd);
+  /* close all open files */
+  for (i = 0; i < files_count; i++)
+    close(files_fd[i]);
+
+  free(files_fd);
+  free(files_name);
+  free(buf);
 
   exit(0);
 }
