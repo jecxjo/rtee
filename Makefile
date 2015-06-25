@@ -3,8 +3,10 @@ SRCS = $(shell ls *.c)
 OBJS = $(SRCS:.c=.o)
 MANS = $(shell ls *.1)
 MANSGZ = $(MANS:.1=.1.gz)
+AUX = $(MANS) LICENSE Makefile
 TARGET = rtee
 GZIP = gzip
+VERSION=0.1
 
 DESTDIR= 
 PREFIX = /usr
@@ -25,10 +27,14 @@ $(TARGET): $(OBJS)
 	$(GZIP) -c $< > $@
 
 clean:
-	rm -f $(TARGET) $(OBJS) $(MANSGZ)
+	rm -f $(TARGET) $(OBJS) $(MANSGZ) $(TARGET)-$(VERSION).tar
 
 install: $(TARGET) $(MANSGZ)
 	install -m 755 -d $(DESTDIR)$(BINDIR)
 	install -m 755 -t $(DESTDIR)$(BINDIR) $(TARGET)
 	install -m 755 -d $(DESTDIR)$(MANDIR)/man1
 	install -m 644 -t $(DESTDIR)$(MANDIR)/man1 $(MANSGZ)
+
+.PHONY: dist
+dist: $(SRCS) $(AUX)
+	tar cf $(TARGET)-$(VERSION).tar $(SRCS) $(AUX)
