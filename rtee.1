@@ -1,4 +1,4 @@
-.TH man 1 "17 June 2015" "0.1" "rtee man page"
+.TH man 1 "25 June 2015" "0.1.1" "rtee man page"
 .SH NAME
 .PP
 rtee \- read from standard input and write to standard output and
@@ -9,20 +9,22 @@ rtee [OPTION]...
 [FILE]...
 .SH DESCRIPTION
 .PP
-\-a Append to the given FILE.
+\-a        Append to the given FILE.
 .PP
-\-b num Maximum number of bytes per file (default 1M)
+\-b num    Maximum number of bytes per file (default 1M)
 .PP
-\-f num Maximum number of previous files before rotating (default 4)
+\-f num    Maximum number of previous files before rotating (default 4)
 .PP
-\-h Display help.
+\-B num    buffer size of read/write operation (default 8192
+.PP
+\-h        Display help.
 .PP
 The FILE name is appended with the count starting at FILE.0.
 When the maximum number of files is reached, the oldest one is deleted
 and the file number continues to increment.
 .SH EXAMPLES
 .PP
-To create 5 backup files with a size of 10 MB or less (10,000 bytes) of
+To create 5 backup files with a size of 10 KB or less of
 the listing of files found in your OS.
 .PP
 find / | rtee \-b 10000 \-f 5 listing.txt
