@@ -3,10 +3,10 @@ SRCS = $(shell ls *.c)
 OBJS = $(SRCS:.c=.o)
 MANS = $(shell ls *.1)
 MANSGZ = $(MANS:.1=.1.gz)
-AUX = $(MANS) LICENSE Makefile
+AUX = $(MANS) LICENSE Makefile README.md
 TARGET = rtee
 GZIP = gzip
-VERSION=0.1
+VERSION=0.1.1
 
 DESTDIR= 
 PREFIX = /usr
