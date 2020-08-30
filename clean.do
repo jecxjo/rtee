@@ -1,1 +1,1 @@
-rm -f rtee rtee.o rtee.d rtee.1.gz rtee-*.tar
+rm -f rtee rtee.o rtee.d rtee.1.gz rtee-*.tar *.did
