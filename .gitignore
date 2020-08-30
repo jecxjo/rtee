@@ -2,3 +2,7 @@ rtree
 *.o
 *.tar
 rtee
+.do_built
+.do_built.dir
+.redo
+*.did
