@@ -6,3 +6,5 @@ rtee
 .do_built.dir
 .redo
 *.did
+*.d
+*.gz
