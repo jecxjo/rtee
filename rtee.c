@@ -5,10 +5,10 @@
  *
  *    Description:  Rotating Tee
  *
- *        Version:  0.2.1
+ *        Version:  0.3.0
  *        Created:  06/16/2015 07:44:16 PM
- *       Revision:  none
- *       Compiler:  gcc
+ *       Revision:  See CHANGELOG.md
+ *       Compiler:  clang, gcc, or cc
  *
  *         Author:  Jeff Parent (jeff@commentedcode.org),
  *
