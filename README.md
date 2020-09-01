@@ -9,10 +9,11 @@ filling up a file system.
 
 ## Install
 
-Build is straight forward using the `Makefile`.
+Build uses [redo](https://cr.yp.to/redo.html). A simple version is included
+with the project.
 
-    make
-    make install
+    ./do
+    DESTDIR= ./do install
 
 ## Synopsis
 
@@ -20,7 +21,9 @@ rtee [OPTION]... [FILE]...
 
 ## Description
 
-    -a       Append to the given FILE.
+    -a       Append to the given FILE
+
+    -e       End on newline if possible
 
     -b num   Maximum number of bytes per file (default 1M)
 

@@ -97,7 +97,7 @@ void print_help_and_die (void)
                         "Copy standard input to FILE until a fixed size and roll over\n"
                         "\n"
                         "    -a        append to the given FILE\n"
-                        "    -e        end files on end of line rather than max bytes\n"
+                        "    -e        end on newline if possible\n"
                         "    -b num    max number of bytes per file (default 1M)\n"
                         "    -f num    max number of previous files before roll over (default 4)\n"
                         "    -B num    buffer size of read/write operation (default 8192)\n"
