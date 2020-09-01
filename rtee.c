@@ -97,6 +97,7 @@ void print_help_and_die (void)
                         "Copy standard input to FILE until a fixed size and roll over\n"
                         "\n"
                         "    -a        append to the given FILE\n"
+                        "    -e        end files on end of line rather than max bytes\n"
                         "    -b num    max number of bytes per file (default 1M)\n"
                         "    -f num    max number of previous files before roll over (default 4)\n"
                         "    -B num    buffer size of read/write operation (default 8192)\n"
@@ -172,17 +173,20 @@ int main (int argc, char *argv[])
   unsigned int del_count = 0;
   int i, fd, ch, exitval, n, read_length, write_length;
   char append = 0;
+  char eol = 0;
   char *end;
   char *write_pt;
   char *buf;
+  char *buf_pt;
   size_t read_buffer_size = BSIZE;
+  char *found;
 
   int files_count = 0;
   char **files_name;
   int *files_fd;
 
   /* Arguments */
-  while ((ch = getopt(argc, argv, "hab:f:B:")) != -1)
+  while ((ch = getopt(argc, argv, "haeb:f:B:")) != -1)
     switch ((char)ch)
     {
       case 'h':
@@ -191,6 +195,10 @@ int main (int argc, char *argv[])
 
       case 'a':
         append = 1;
+        break;
+
+      case 'e':
+        eol = 1;
         break;
 
       case 'b':
@@ -256,9 +264,38 @@ int main (int argc, char *argv[])
       write_pt += write_length;
     } while (n -= write_length);
 
+    found = NULL;
+    buf_pt = buf;
+
     /* check if new file is needed */
     if (byte_count + read_length > max_bytes)
     {
+      /* If searching for eol */
+      if (eol == 1)
+      {
+        /* search for newline */
+        found = strchr(buf, '\n');
+
+        if (found)
+        {
+          /* Write to files */
+          for (i = 0; i < files_count; i++)
+          {
+            n = (found - buf + 1);
+            write_pt = buf;
+            do
+            {
+              if ((write_length = write(files_fd[i], write_pt, n)) == -1)
+                print_error_and_die("write error: file");
+
+              write_pt += write_length;
+            } while (n -= write_length);
+          }
+
+          buf_pt = found + 1;
+        }
+      }
+
       file_count += 1;
 
       for (i = 0; i < files_count; i++)
@@ -278,11 +315,12 @@ int main (int argc, char *argv[])
       }
     }
 
+
     /* Write to files */
     for (i = 0; i < files_count; i++)
     {
-      n = read_length;
-      write_pt = buf;
+      n = read_length - (buf_pt - buf);
+      write_pt = buf_pt;
       do
       {
         if ((write_length = write(files_fd[i], write_pt, n)) == -1)
