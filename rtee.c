@@ -78,8 +78,8 @@
 #include <errno.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include <sys/types.h>
-#include <sys/stat.h>
+
+#include "config.h"
 
 #define BSIZE (8 * 1024)
 
@@ -124,7 +124,7 @@ int open_file (char *name, unsigned long count, char append)
   if ((newName = malloc((size_t)(strlen(name) + 11))) == NULL)
     print_error_and_die("Unable to malloc");
 
-  sprintf(newName, "%s.%lu\0", name, count);
+  sprintf(newName, "%s.%lu", name, count);
 
   fd = open(newName,
       O_CREAT | O_WRONLY | (append == 1 ? O_APPEND : O_TRUNC),
@@ -151,7 +151,7 @@ void del_file (char *name, unsigned long count)
     if ((newName = malloc((size_t)(strlen(name) + 11))) == NULL)
       print_error_and_die("Unable to malloc");
 
-    sprintf(newName, "%s.%lu\0", name, count);
+    sprintf(newName, "%s.%lu", name, count);
 
     status = remove(newName);
 
