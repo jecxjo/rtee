@@ -8,3 +8,6 @@ rtee
 *.did
 *.d
 *.gz
+config/*
+!config/*.do
+config.h
