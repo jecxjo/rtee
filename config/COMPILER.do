@@ -1,9 +1,9 @@
+#!/usr/bin/env bash
+
 # Check LLVM
-if [ "x$(which clang)" != "x" ]
-then
+if [ "x$(which clang)" != "x" ]; then
   echo "int main() { return 0; }" | clang -o /dev/null -xc -
-  if [ $? -eq 0 ];
-  then
+  if [ $? -eq 0 ]; then
     echo $(which clang) >$3
     redo-always
     redo-stamp <$3
@@ -12,10 +12,9 @@ then
 fi
 
 # Check gcc
-if [ "x$(which gcc)" != "x" ]
+if [ "x$(which gcc)" != "x" ]; then
   echo "void main() {}" | gcc -o /dev/null -xc -
-  if [ $? -eq 0 ];
-  then
+  if [ $? -eq 0 ]; then
     echo $(which gcc) >$3
     redo-always
     redo-stamp <$3
@@ -24,10 +23,9 @@ if [ "x$(which gcc)" != "x" ]
 fi
 
 # Check cc
-if [ "x$(which cc)" != "x" ]
+if [ "x$(which cc)" != "x" ]; then
   echo "void main() {}" | cc -o /dev/null -xc -
-  if [ $? -eq 0 ];
-  then
+  if [ $? -eq 0 ]; then
     echo $(which cc) >$3
     redo-always
     redo-stamp <$3

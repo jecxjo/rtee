@@ -4,4 +4,10 @@
 
 #define COMPILER %COMPILER%
 
+#define OS %OS%
+
+#if defined OS && OS == NetBSD
+#include <sys/stat.h>
+#endif
+
 #endif // __CONFIG_H
