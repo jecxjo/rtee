@@ -5,7 +5,7 @@
  *
  *    Description:  Rotating Tee
  *
- *        Version:  0.3.0
+ *        Version:  0.3.1
  *        Created:  06/16/2015 07:44:16 PM
  *       Revision:  See CHANGELOG.md
  *       Compiler:  clang, gcc, or cc
