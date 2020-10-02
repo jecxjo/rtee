@@ -11,3 +11,4 @@ rtee
 config/*
 !config/*.do
 config.h
+archive.tgz
